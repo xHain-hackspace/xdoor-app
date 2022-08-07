@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'settings.dart';
+import 'package:xdoor/utils/navigator_key.dart';
+import 'screens/home_screen/home_screen.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 void main() {
-  runApp(const XDoor());
+  runApp(const App());
 }
 
 Map<int, Color> color = {
@@ -19,69 +20,75 @@ Map<int, Color> color = {
   900: const Color.fromRGBO(7, 44, 47, 1),
 };
 
-class XDoor extends StatelessWidget {
-  const XDoor({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
+class App extends StatelessWidget {
+  const App({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'xDoor',
-      theme: ThemeData(
-        primarySwatch: MaterialColor(0xFF072C2F, color),
+    final theme = ThemeData(
+      primarySwatch: MaterialColor(0xFF072C2F, color),
+    );
+    return Theme(
+      data: theme,
+      child: PlatformProvider(
+        settings: PlatformSettingsData(iosUsesMaterialWidgets: false),
+        builder: (context) => PlatformApp(
+          debugShowCheckedModeBanner: false,
+          title: 'xDoor',
+          home: HomeView(),
+          navigatorKey: navigatorKey, // Setting a global key for navigator
+        ),
       ),
-      home: const XDoorMain(title: 'xDoor'),
     );
   }
 }
 
-class XDoorMain extends StatefulWidget {
-  const XDoorMain({Key? key, required this.title}) : super(key: key);
+// class XDoorMain extends StatefulWidget {
+//   const XDoorMain({Key? key, required this.title}) : super(key: key);
 
-  final String title;
+//   final String title;
 
-  @override
-  State<XDoorMain> createState() => _XDoorState();
-}
+//   @override
+//   State<XDoorMain> createState() => _XDoorState();
+// }
 
-class _XDoorState extends State<XDoorMain> {
-  // Navigation
-  int _selectedIndex = 0;
-  static final List<Widget> _pages = <Widget>[
-    const HomeView(),
-    const SettingsView(),
-  ];
+// class _XDoorState extends State<XDoorMain> {
+//   // Navigation
+//   int _selectedIndex = 0;
+//   static final List<Widget> _pages = <Widget>[
+//     const HomeView(),
+//     const SettingsView(),
+//   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+//   void _onItemTapped(int index) {
+//     setState(() {
+//       _selectedIndex = index;
+//     });
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(widget.title),
+//       ),
+//       body: IndexedStack(
+//         index: _selectedIndex,
+//         children: _pages,
+//       ),
+//       bottomNavigationBar: BottomNavigationBar(
+//         items: const <BottomNavigationBarItem>[
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.home),
+//             label: 'Home',
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.settings),
+//             label: 'Settings',
+//           ),
+//         ],
+//         currentIndex: _selectedIndex,
+//         onTap: _onItemTapped,
+//       ),
+//     );
+//   }
+// }
