@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:xdoor/utils/navigator_key.dart';
+import 'package:provider/provider.dart';
+import 'package:xdoor/models/ssh_key_list.dart';
+import 'package:xdoor/utils/secure_store.dart';
 import 'screens/home_screen/home_screen.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-void main() {
+void main() async {
   runApp(const App());
 }
 
@@ -30,12 +33,21 @@ class App extends StatelessWidget {
     return Theme(
       data: theme,
       child: PlatformProvider(
-        settings: PlatformSettingsData(iosUsesMaterialWidgets: false),
-        builder: (context) => PlatformApp(
-          debugShowCheckedModeBanner: false,
-          title: 'xDoor',
-          home: HomeView(),
-          navigatorKey: navigatorKey, // Setting a global key for navigator
+        settings: PlatformSettingsData(
+          iosUsesMaterialWidgets: false,
+        ),
+        builder: (context) => ChangeNotifierProvider<SSHKeyList>(
+          create: (context) => SSHKeyList.fromStorage(),
+          child: const PlatformApp(
+            localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+              DefaultMaterialLocalizations.delegate,
+              DefaultWidgetsLocalizations.delegate,
+              DefaultCupertinoLocalizations.delegate,
+            ],
+            debugShowCheckedModeBanner: false,
+            title: 'xDoor',
+            home: HomeView(),
+          ),
         ),
       ),
     );
