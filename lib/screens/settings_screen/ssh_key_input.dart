@@ -69,34 +69,85 @@ class _SSHKeyInputState extends State<SSHKeyInput> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Name'),
+                  PlatformWidget(
+                    material: (context, platform) => const Text('Name'),
+                  ),
                   PlatformTextFormField(
+                    cupertino: (context, platform) =>
+                        CupertinoTextFormFieldData(
+                      prefix: const Text("Name:"),
+                      placeholder: "Required",
+                      validator: _validateNameIos,
+                      autovalidateMode: AutovalidateMode.disabled,
+                    ),
+                    material: (context, platform) => MaterialTextFormFieldData(
+                      validator: _validateNameMaterial,
+                      autovalidateMode: AutovalidateMode.always,
+                    ),
                     initialValue: widget._existingKey?.name,
                     controller: _nameController,
-                    validator: (value) => _validateName(value),
-                    autovalidateMode: AutovalidateMode.always,
+                    keyboardType: TextInputType.multiline,
                   ),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  const Text('Private Key'),
+                  // const Padding(padding: EdgeInsets.only(top: 10)),
+                  PlatformWidget(
+                    material: (context, platform) => const Text('Private Key'),
+                  ),
                   PlatformTextFormField(
+                    cupertino: (context, platform) =>
+                        CupertinoTextFormFieldData(
+                      prefix: const Text("Private Key:"),
+                      placeholder: "Required",
+                      validator: _validatePrivateKeyIos,
+                      autovalidateMode: AutovalidateMode.disabled,
+                    ),
+                    material: (context, platform) => MaterialTextFormFieldData(
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: _validatePrivateKeyMaterial,
+                    ),
                     initialValue: widget._existingKey?.privateKey,
                     controller: _privateKeyController,
                     minLines: 1,
-                    maxLines: 5,
+                    maxLines: 2,
                     keyboardType: TextInputType.multiline,
-                    validator: (value) => _validatePrivateKey(value),
-                    autovalidateMode: AutovalidateMode.always,
                   ),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  const Text('Public Key'),
+
+                  // const Padding(padding: EdgeInsets.fromLTRB(10, 10, 0, 0)),
+                  PlatformWidget(
+                    material: (context, platform) => const Text('Public Key'),
+                  ),
                   PlatformTextFormField(
+                    cupertino: (context, platform) =>
+                        CupertinoTextFormFieldData(
+                      prefix: const Text("Public Key:"),
+                      placeholder: "Optional",
+                      validator: _validatePublicKeyIos,
+                      autovalidateMode: AutovalidateMode.disabled,
+                    ),
+                    material: (context, platform) => MaterialTextFormFieldData(
+                      validator: _validatePublicKeyMaterial,
+                      autovalidateMode: AutovalidateMode.always,
+                    ),
                     initialValue: widget._existingKey?.publicKey,
                     minLines: 1,
-                    maxLines: 5,
+                    maxLines: 2,
                     controller: _publicKeyController,
                     keyboardType: TextInputType.multiline,
-                    validator: (value) => _validatePublicKey(value),
-                    autovalidateMode: AutovalidateMode.always,
+                  ),
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _nameController,
+                    builder: (context, value, child) {
+                      return PlatformTextButton(
+                        child: Text('Generate'),
+                        onPressed: value.text.isEmpty
+                            ? null
+                            : () {
+                                final key =
+                                    SSHKey.generate(_nameController.text);
+                                _privateKeyController.text = key.privateKey;
+                                _publicKeyController.text = key.publicKey;
+                              },
+                      );
+                    },
                   ),
                 ],
               ),
@@ -107,7 +158,7 @@ class _SSHKeyInputState extends State<SSHKeyInput> {
     );
   }
 
-  String? _validatePrivateKey(String? val) {
+  String? _validatePrivateKeyMaterial(String? val) {
     if (val == null || val == '') {
       return 'Required field';
     }
@@ -119,14 +170,45 @@ class _SSHKeyInputState extends State<SSHKeyInput> {
     return null;
   }
 
-  String? _validateName(String? val) {
+  String? _validateNameMaterial(String? val) {
     if (val == null || val == '') {
       return 'Required field';
     }
     return null;
   }
 
-  String? _validatePublicKey(String? val) {
+  String? _validatePublicKeyMaterial(String? val) {
+    if (val == null || val == '') {
+      return null;
+    }
+    try {
+      SSHKeyPair.fromPem(val);
+    } catch (ex) {
+      return 'Invalid Format';
+    }
+    return null;
+  }
+
+  String? _validatePrivateKeyIos(String? val) {
+    if (val == null || val == '') {
+      return '';
+    }
+    try {
+      SSHKeyPair.fromPem(val);
+    } catch (ex) {
+      return 'Invalid Format';
+    }
+    return null;
+  }
+
+  String? _validateNameIos(String? val) {
+    if (val == null || val == '') {
+      return '';
+    }
+    return null;
+  }
+
+  String? _validatePublicKeyIos(String? val) {
     if (val == null || val == '') {
       return null;
     }
